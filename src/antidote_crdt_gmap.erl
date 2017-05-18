@@ -124,7 +124,7 @@ from_binary(<<?TAG:8/integer, ?V1_VERS:8/integer, Bin/binary>>) ->
 is_operation(Operation) ->
   case Operation of
     {update, {{_Key, Type}, Op}} ->
-      antidote_crdt:is_type(Type)
+      (antidote_crdt:is_type(Type) orelse antidote_ccrdt:is_type(Type))
         andalso Type:is_operation(Op);
     {update, Ops} when is_list(Ops) ->
       distinct([Key || {Key, _} <- Ops])
