@@ -70,7 +70,10 @@ downstream({update, {{Key, Type}, Op}}, CurrentMap) ->
       false -> Type:new()
     end,
     {ok, DownstreamOp} = Type:downstream(Op, CurrentValue),
-    {ok, {update, {{Key, Type}, DownstreamOp}}};
+    case DownstreamOp of
+   	true -> {ok, noop};
+        false ->  {ok, {update, {{Key, Type}, DownstreamOp}}}
+    end;
 downstream({update, Ops}, CurrentMap) when is_list(Ops) ->
     {ok, {update, lists:map(fun(Op) -> {ok, DSOp} = downstream({update, Op}, CurrentMap), DSOp end, Ops)}};
 downstream({reset, {}}, CurrentMap) ->
