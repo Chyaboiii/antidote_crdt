@@ -75,7 +75,12 @@ downstream({update, {{Key, Type}, Op}}, CurrentMap) ->
         _ ->  {ok, {update, {{Key, Type}, DownstreamOp}}}
     end;
 downstream({update, Ops}, CurrentMap) when is_list(Ops) ->
-    {ok, {update, lists:map(fun(Op) -> {ok, DSOp} = downstream({update, Op}, CurrentMap), DSOp end, Ops)}};
+    {ok, {update, lists:foldl(fun(Op, Acc) -> {ok, DSOp} = downstream({update, Op}, CurrentMap),
+					      case DSOp of
+						noop -> Acc;
+						_ -> [DSOp | Acc]
+					      end
+                              end, [], Ops)}};
 downstream({reset, {}}, CurrentMap) ->
   % calls reset on all embedded keys which support reset
   Reset =
